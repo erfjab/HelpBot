@@ -3,6 +3,7 @@ module helpbot
 go 1.25.5
 
 require (
+	github.com/erfjab/egobot v0.2.3
 	github.com/glebarez/sqlite v1.11.0
 	github.com/spf13/viper v1.21.0
 	gorm.io/gorm v1.31.1

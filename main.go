@@ -3,16 +3,21 @@ package main
 import (
 	"helpbot/internal/config"
 	"helpbot/internal/database"
+	"helpbot/internal/handlers"
 	"log"
+
+	"github.com/erfjab/egobot/core"
 )
 
 func main() {
 	log.Printf("Starting HelpBot...")
-	_, err := config.LoadConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Printf("Error loading config: %v", err)
 	}
 	log.Printf("Config loaded successfully")
+
+	log.Printf("AdminIds: %v", cfg.TelegramAdminsID)
 
 	err = database.LoadDB("helpbot.db")
 	if err != nil {
@@ -35,4 +40,21 @@ func main() {
 	}
 	log.Printf("Database auto-migration successful")
 
+	bot := core.NewBot(cfg.TelegramToken)
+
+	getBotInfo, err := bot.GetMe()
+	if err != nil {
+		log.Fatalf("error getting bot info: %v", err)
+	}
+	log.Printf("Telegram bot initialized: @%s (ID: %d)", getBotInfo.Username, getBotInfo.ID)
+
+	handlers.RegisterHandlers(bot)
+	log.Printf("Registered handlers")
+
+	bot.StartPolling(&core.PollingOptions{
+		Timeout:    60,
+		Limit:      100,
+		Async:      true,
+		RetryDelay: 3,
+	})
 }
