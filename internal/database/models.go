@@ -17,6 +17,15 @@ func (Items) TableName() string {
 	return "items"
 }
 
+func GetItemByID(id uint) (*Items, error) {
+	var item Items
+	result := DB.First(&item, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &item, nil
+}
+
 func GetAllItems(search string) ([]Items, error) {
 	var items []Items
 	result := DB.Where("title LIKE ? OR content LIKE ?", "%"+search+"%", "%"+search+"%").Find(&items)
